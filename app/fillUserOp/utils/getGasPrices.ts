@@ -1,4 +1,4 @@
-import { publicClient } from "@/app/route";
+import { publicClient } from "@/app/clients";
 
 type GasPrices = {
   maxPriorityFeePerGas: bigint;

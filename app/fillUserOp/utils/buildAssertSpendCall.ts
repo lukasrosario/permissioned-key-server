@@ -3,7 +3,7 @@ import { Call } from "../handleFillUserOp";
 import { decodePermissionContext } from "./decodePermissionsContext";
 import { sessionCallPermissionAbi } from "@/app/abi/sessionCallPermission";
 import { hashPermission } from "./hashPermission";
-import { publicClient } from "@/app/route";
+import { publicClient } from "@/app/clients";
 
 export async function buildAssertSpendCall(
   attemptedSpend: bigint,

@@ -13,22 +13,6 @@ import {
 } from "./fillUserOp/handleFillUserOp";
 import { NextResponse } from "next/server";
 
-export const publicClient = createPublicClient({
-  chain: baseSepolia,
-  transport: http(),
-});
-
-export const bundlerClient = createBundlerClient({
-  chain: baseSepolia,
-  transport: http(process.env.BUNDLER_URL),
-  entryPoint: entrypointAddress,
-});
-
-export const paymasterEip7677Client = createClient({
-  chain: baseSepolia,
-  transport: http(process.env.PAYMASTER_URL),
-}).extend(paymasterActionsEip7677(ENTRYPOINT_ADDRESS_V06));
-
 type APIRequest =
   | FillUserOpRequest
   | {
@@ -51,7 +35,7 @@ export async function POST(r: Request) {
     case "wallet_fillUserOp":
       return handleFillUserOp(req.params);
     case "wallet_sendUserOpWithSignature":
-      return 1;
+      return Response.json({ message: "ok" });
     default:
       return Response.json({ error: "Invalid method" }, { status: 400 });
   }
