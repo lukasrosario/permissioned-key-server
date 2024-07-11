@@ -1,19 +1,12 @@
 import { Address, Hex } from "viem";
 import { getSignature } from "./utils/getSignature";
-
-type UserOperationWithBigIntAsHex = {
-  sender: Address;
-  nonce: Hex;
-  initCode: Hex;
-  callData: Hex;
-  callGasLimit: Hex;
-  verificationGasLimit: Hex;
-  preVerificationGas: Hex;
-  maxFeePerGas: Hex;
-  maxPriorityFeePerGas: Hex;
-  paymasterAndData: Hex;
-  signature: Hex;
-};
+import {
+  UserOperationWithBigIntAsHex,
+  updateUserOpSignature,
+} from "./utils/userOp";
+import { bundlerClient } from "../clients";
+import { UserOperation } from "permissionless";
+import { decodePermissionContext } from "../fillUserOp/utils/decodePermissionsContext";
 
 export type SignatureData = {
   authenticatorData: string;
@@ -22,10 +15,10 @@ export type SignatureData = {
 };
 
 type SendUserOpWithSignatureParams = {
-  userOp: UserOperationWithBigIntAsHex;
   chainId: Hex;
-  signature: SignatureData;
+  userOp: UserOperationWithBigIntAsHex;
   permissionsContext: Hex;
+  signatureData: SignatureData;
 };
 
 export type SendUserOpWithSignatureRequest = {
@@ -36,8 +29,39 @@ export type SendUserOpWithSignatureRequest = {
 export async function handleSendUserOpWithSignature(
   request: SendUserOpWithSignatureParams,
 ) {
-  const signature = getSignature(request.signature, request.permissionsContext);
+  const { permissionManagerOwnerIndex, permission } = decodePermissionContext(
+    request.permissionsContext,
+  );
+  console.log(
+    "decoded permissionManager ownerIndex",
+    permissionManagerOwnerIndex,
+  );
+  console.log("decoded permission", permission);
 
-  //...
-  // TODO
+  const updatedOp = updateUserOpSignature({
+    userOp: request.userOp,
+    permissionSignerSignature: getSignature(request.signatureData),
+    permissionManagerOwnerIndex,
+    permission,
+  });
+  console.log("updated userOp", updatedOp);
+
+  const userOpHash = await bundlerClient.sendUserOperation({
+    userOperation: {
+      ...updatedOp,
+      // bigint-ify hexlified numbers
+      nonce: BigInt(updatedOp.nonce),
+      callGasLimit: BigInt(updatedOp.callGasLimit),
+      verificationGasLimit: BigInt(updatedOp.nonce),
+      preVerificationGas: BigInt(updatedOp.preVerificationGas),
+      maxFeePerGas: BigInt(updatedOp.maxFeePerGas),
+      maxPriorityFeePerGas: BigInt(updatedOp.maxPriorityFeePerGas),
+    },
+  });
+
+  return Response.json({
+    result: {
+      callsId: userOpHash,
+    },
+  });
 }
