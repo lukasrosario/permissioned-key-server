@@ -1,10 +1,11 @@
-import { Hex } from "viem";
+import { Hex, encodeAbiParameters } from "viem";
 import {
   UserOperationWithBigIntAsHex,
   updateUserOpSignature,
 } from "./utils/userOp";
 import { bundlerClient } from "../clients";
 import { decodePermissionContext } from "../fillUserOp/utils/decodePermissionsContext";
+import { baseSepolia } from "viem/chains";
 
 type SendUserOpWithSignatureParams = {
   chainId: Hex;
@@ -45,9 +46,17 @@ export async function handleSendUserOpWithSignature(
     },
   });
 
+  const callsId = encodeAbiParameters(
+    [
+      { name: "userOpHash", type: "bytes32" },
+      { name: "chainId", type: "uint256" },
+    ],
+    [userOpHash, BigInt(bundlerClient.chain?.id ?? baseSepolia.id)],
+  );
+
   return Response.json({
     result: {
-      callsId: userOpHash,
+      callsId,
     },
   });
 }
