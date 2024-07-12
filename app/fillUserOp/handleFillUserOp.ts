@@ -88,8 +88,10 @@ export async function handleFillUserOp(request: FillUserOpParams) {
   userOpToSign = {
     ...userOpToSign,
     callGasLimit: gasEstimates.callGasLimit,
-    verificationGasLimit: gasEstimates.verificationGasLimit,
+    // verificationGasLimit: gasEstimates.verificationGasLimit,
     // preVerificationGas: gasEstimates.preVerificationGas,
+    // TODO: verification values too low for unknown reason, hardcoding ~10x of what we typically need
+    verificationGasLimit: BigInt(659160),
     preVerificationGas: BigInt(1248270),
   };
 
@@ -103,12 +105,13 @@ export async function handleFillUserOp(request: FillUserOpParams) {
     paymasterAndData: paymasterData.paymasterAndData,
   };
 
-  const userOpHash = await getUserOpHash(userOpToSign);
+  const { hash, base64Hash } = await getUserOpHash(userOpToSign);
 
   return Response.json({
     result: {
       userOp: deepHexlify({ ...userOpToSign, signature: "0x" }),
-      hash: userOpHash,
+      hash,
+      base64Hash,
     },
   });
 }

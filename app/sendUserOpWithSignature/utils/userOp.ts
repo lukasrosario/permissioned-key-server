@@ -2,17 +2,7 @@ import {
   Permission,
   permissionStruct,
 } from "@/app/fillUserOp/utils/decodePermissionsContext";
-import {
-  Address,
-  Hex,
-  decodeAbiParameters,
-  encodeAbiParameters,
-  parseAbiParameter,
-} from "viem";
-
-/**
- *  wallet_sendCalls utils
- */
+import { Address, Hex, encodeAbiParameters, parseAbiParameter } from "viem";
 
 // note this is for v0.6, our current Entrypoint version for CoinbaseSmartWallet
 export const userOperationStruct = parseAbiParameter([
