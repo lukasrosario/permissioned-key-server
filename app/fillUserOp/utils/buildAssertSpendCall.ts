@@ -1,9 +1,9 @@
 import { Address, Hex, encodeFunctionData } from "viem";
 import { Call } from "../handleFillUserOp";
 import { decodePermissionContext } from "./decodePermissionsContext";
-import { sessionCallPermissionAbi } from "@/app/abi/sessionCallPermission";
 import { hashPermission } from "./hashPermission";
 import { publicClient } from "@/app/clients";
+import { callWithPermissionAbi } from "@/app/abi/callWithPermission";
 
 export async function buildAssertSpendCall(
   attemptedSpend: bigint,
@@ -17,7 +17,7 @@ export async function buildAssertSpendCall(
     to: permission.permissionContract as Address,
     value: "0x0" as Hex,
     data: encodeFunctionData({
-      abi: sessionCallPermissionAbi,
+      abi: callWithPermissionAbi,
       functionName: "assertSpend",
       args: [
         balance - attemptedSpend, // enforce balance only decreases by accounted attempted spend for reentrancy protection

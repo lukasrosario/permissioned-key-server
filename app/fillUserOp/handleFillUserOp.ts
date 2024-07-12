@@ -23,7 +23,7 @@ type FillUserOpParams = {
   calls: Call[];
   capabilities: {
     paymasterService: { url: string };
-    permissions: { context: Hex };
+    permissions?: { context: Hex };
   };
 }[];
 
@@ -34,23 +34,8 @@ export type FillUserOpRequest = {
 
 export async function handleFillUserOp(request: FillUserOpParams) {
   const { calls, capabilities, from } = request[0];
-  let callsForCallData = calls;
 
-  // accumulate attempted spend from calls and insert new call to registerSpend
-  const attemptedSpend = calls.reduce(
-    (acc, call) => acc + hexToBigInt(call.value ?? "0x0"),
-    BigInt(0),
-  );
-
-  if (attemptedSpend > BigInt(0)) {
-    const assertSpendCall = await buildAssertSpendCall(
-      attemptedSpend,
-      capabilities.permissions.context,
-    );
-    callsForCallData = [...calls, assertSpendCall];
-  }
-
-  const callData = getCallData(callsForCallData);
+  const callData = await getCallData(calls, capabilities.permissions?.context);
 
   const nonce = await getNonce(from);
 

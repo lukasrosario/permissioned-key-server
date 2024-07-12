@@ -20,7 +20,6 @@ export function decodePermissionContext(permissionContext: Hex): {
   permissionManagerOwnerIndex: bigint;
   permission: Permission;
 } {
-  console.log("decoding context", permissionContext);
   const [permissionManagerOwnerIndex, permission] = decodeAbiParameters(
     [
       { name: "permissionManagerOwnerIndex", type: "uint256" },
