@@ -1,25 +1,14 @@
-import { Hex } from "viem";
-import { UserOperation } from "permissionless";
 import {
   handleFillUserOp,
   FillUserOpRequest,
 } from "./fillUserOp/handleFillUserOp";
 import { NextResponse } from "next/server";
+import {
+  SendUserOpWithSignatureRequest,
+  handleSendUserOpWithSignature,
+} from "./sendUserOpWithSignature/handleSendUserOpWIthSignature";
 
-type APIRequest =
-  | FillUserOpRequest
-  | {
-      method: "wallet_sendUserOpWithSignature";
-      params: {
-        chainId: Hex;
-        userOp: UserOperation<"v0.6">;
-        signature: {
-          authenticatorData: string;
-          clientDataJSON: string;
-          signature: string;
-        };
-      };
-    };
+type APIRequest = FillUserOpRequest | SendUserOpWithSignatureRequest;
 
 export async function POST(r: Request) {
   const req = (await r.json()) as APIRequest;
@@ -28,7 +17,7 @@ export async function POST(r: Request) {
     case "wallet_fillUserOp":
       return handleFillUserOp(req.params);
     case "wallet_sendUserOpWithSignature":
-      return Response.json({ message: "ok" });
+      return handleSendUserOpWithSignature(req.params);
     default:
       return Response.json({ error: "Invalid method" }, { status: 400 });
   }
