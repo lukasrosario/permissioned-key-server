@@ -72,9 +72,9 @@ export async function handleFillUserOp(request: FillUserOpParams) {
 
   userOpToSign = {
     ...userOpToSign,
-    callGasLimit: gasEstimates.callGasLimit * BigInt(2),
-    verificationGasLimit: gasEstimates.verificationGasLimit * BigInt(2),
-    preVerificationGas: gasEstimates.preVerificationGas * BigInt(2),
+    callGasLimit: gasEstimates.callGasLimit * BigInt(3),
+    verificationGasLimit: gasEstimates.verificationGasLimit * BigInt(3),
+    preVerificationGas: gasEstimates.preVerificationGas * BigInt(3),
   };
 
   const paymasterData = await paymasterEip7677Client.getPaymasterData({
