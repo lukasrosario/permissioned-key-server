@@ -72,7 +72,7 @@ export async function handleFillUserOp(request: FillUserOpParams) {
 
   userOpToSign = {
     ...userOpToSign,
-    callGasLimit: gasEstimates.callGasLimit,
+    callGasLimit: BigInt(Math.floor(Number(gasEstimates.callGasLimit) * 1.5)),
     // verificationGasLimit: gasEstimates.verificationGasLimit,
     // preVerificationGas: gasEstimates.preVerificationGas,
     // TODO: verification values too low for unknown reason, hardcoding ~10x of what we typically need
