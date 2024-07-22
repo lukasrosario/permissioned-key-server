@@ -76,8 +76,8 @@ export async function handleFillUserOp(request: FillUserOpParams) {
     // verificationGasLimit: gasEstimates.verificationGasLimit,
     // preVerificationGas: gasEstimates.preVerificationGas,
     // TODO: verification values too low for unknown reason, hardcoding ~10x of what we typically need
-    verificationGasLimit: BigInt(659160),
-    preVerificationGas: BigInt(1248270),
+    verificationGasLimit: gasEstimates.verificationGasLimit,
+    preVerificationGas: gasEstimates.preVerificationGas,
   };
 
   const paymasterData = await paymasterEip7677Client.getPaymasterData({
