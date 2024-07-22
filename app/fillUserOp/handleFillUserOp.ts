@@ -72,16 +72,9 @@ export async function handleFillUserOp(request: FillUserOpParams) {
 
   userOpToSign = {
     ...userOpToSign,
-    callGasLimit: BigInt(Math.floor(Number(gasEstimates.callGasLimit) * 1.5)),
-    // verificationGasLimit: gasEstimates.verificationGasLimit,
-    // preVerificationGas: gasEstimates.preVerificationGas,
-    // TODO: verification values too low for unknown reason, hardcoding ~10x of what we typically need
-    verificationGasLimit: BigInt(
-      Math.floor(Number(gasEstimates.verificationGasLimit) * 1.5),
-    ),
-    preVerificationGas: BigInt(
-      Math.floor(Number(gasEstimates.preVerificationGas) * 1.5),
-    ),
+    callGasLimit: gasEstimates.callGasLimit * BigInt(2),
+    verificationGasLimit: gasEstimates.verificationGasLimit * BigInt(2),
+    preVerificationGas: gasEstimates.preVerificationGas * BigInt(2),
   };
 
   const paymasterData = await paymasterEip7677Client.getPaymasterData({
