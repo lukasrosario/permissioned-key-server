@@ -1,5 +1,5 @@
 import { privateKeyToAccount } from "viem/accounts";
-import { createWalletClient, http, Hex } from "viem";
+import { Hex } from "viem";
 import {
   ENTRYPOINT_ADDRESS_V06,
   getUserOperationHash,
@@ -7,10 +7,9 @@ import {
 } from "permissionless";
 import { baseSepolia } from "viem/chains";
 
-const cosignerWalletClient = createWalletClient({
-  transport: http("https://sepolia.base.org"),
-  account: privateKeyToAccount(process.env.COSIGNER_PRIVATE_KEY as Hex),
-});
+const cosignerAccount = privateKeyToAccount(
+  process.env.COSIGNER_PRIVATE_KEY as Hex,
+);
 
 export async function cosignUserOp(userOperation: UserOperation<"v0.6">) {
   const userOpHash = getUserOperationHash({
@@ -25,10 +24,8 @@ export async function cosignUserOp(userOperation: UserOperation<"v0.6">) {
     throw Error("Cosigning rejected.");
   }
 
-  // pretty sure this will NOT work because of forced EIP-191 prefixing on viem's default `signMessage`
-  // should look into their latest utils just for userOps
-  const cosignature = await cosignerWalletClient.signMessage({
-    message: { raw: userOpHash },
+  const cosignature = await cosignerAccount.sign({
+    hash: userOpHash,
   });
 
   return cosignature;
