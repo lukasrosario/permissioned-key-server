@@ -7,8 +7,20 @@ import {
   SendUserOpWithSignatureRequest,
   handleSendUserOpWithSignature,
 } from "./sendUserOpWithSignature/handleSendUserOpWIthSignature";
+import {
+  handleStorePermission,
+  StorePermissionsRequest,
+} from "./storePermission/handleStorePermission";
+import {
+  GetActivePermissionsRequest,
+  handleGetActivePermissions,
+} from "./getActivePermissions/handleGetActivePermissions";
 
-type APIRequest = FillUserOpRequest | SendUserOpWithSignatureRequest;
+type APIRequest =
+  | FillUserOpRequest
+  | SendUserOpWithSignatureRequest
+  | StorePermissionsRequest
+  | GetActivePermissionsRequest;
 
 export async function POST(r: Request) {
   const req = (await r.json()) as APIRequest;
@@ -18,6 +30,10 @@ export async function POST(r: Request) {
       return handleFillUserOp(req.params);
     case "wallet_sendUserOpWithSignature":
       return handleSendUserOpWithSignature(req.params);
+    case "wallet_storePermission":
+      return handleStorePermission(req.params);
+    case "wallet_getActivePermissions":
+      return handleGetActivePermissions(req.params);
     default:
       return Response.json({ error: "Invalid method" }, { status: 400 });
   }

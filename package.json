@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@scure/base": "^1.1.7",
+    "@vercel/postgres": "^0.9.0",
     "next": "14.2.4",
     "permissionless": "^0.1.36",
     "react": "^18",
