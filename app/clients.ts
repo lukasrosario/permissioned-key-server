@@ -2,7 +2,6 @@ import { createBundlerClient, ENTRYPOINT_ADDRESS_V06 } from "permissionless";
 import { paymasterActionsEip7677 } from "permissionless/experimental";
 import { createPublicClient, http, createClient } from "viem";
 import { baseSepolia } from "viem/chains";
-import { entrypointAddress } from "./abi/entrypoint";
 
 export const publicClient = createPublicClient({
   chain: baseSepolia,
@@ -12,7 +11,7 @@ export const publicClient = createPublicClient({
 export const bundlerClient = createBundlerClient({
   chain: baseSepolia,
   transport: http(process.env.BUNDLER_URL),
-  entryPoint: entrypointAddress,
+  entryPoint: ENTRYPOINT_ADDRESS_V06,
 });
 
 export const paymasterEip7677Client = createClient({
