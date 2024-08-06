@@ -18,12 +18,13 @@ export async function cosignUserOp(userOperation: UserOperation<"v0.6">) {
     chainId: baseSepolia.id,
   });
 
-  const rejectCosign = false;
+  const rejectCosign = false; // TODO: add dynamic logic to reject cosigning
 
   if (rejectCosign) {
     throw Error("Cosigning rejected.");
   }
 
+  // raw `sign` does not pad EIP-191 hash, required for working with SmartWallet
   const cosignature = await cosignerAccount.sign({
     hash: userOpHash,
   });
