@@ -1,4 +1,4 @@
-import { Address, encodeFunctionData, Hex } from "viem";
+import { Address, encodeFunctionData, Hex, keccak256 } from "viem";
 import { UserOperation } from "permissionless";
 
 import { PermissionManager } from "../constants";

@@ -1,11 +1,13 @@
 import { Hex, encodeAbiParameters } from "viem";
-import {
-  UserOperationWithBigIntAsHex,
-  updateUserOpSignature,
-} from "./utils/userOp";
 import { bundlerClient } from "../clients";
-import { decodePermissionContext } from "../fillUserOp/utils/decodePermissionsContext";
 import { baseSepolia } from "viem/chains";
+import {
+  unhexlifyUserOp,
+  UserOperationWithBigIntAsHex,
+} from "./utils/unhexlifyUserOp";
+import { cosignUserOp } from "../utils/cosignUserOp";
+import { formatUserOpSignature } from "../utils/formatUserOpSignature";
+import { decodePermissionContext } from "../utils/decodePermissionContext";
 
 type SendUserOpWithSignatureParams = {
   chainId: Hex;
@@ -26,23 +28,22 @@ export async function handleSendUserOpWithSignature(
     request.permissionsContext,
   );
 
-  const updatedOp = updateUserOpSignature({
-    userOp: request.userOp,
-    permissionSignerSignature: request.signature,
+  const userOp = unhexlifyUserOp(request.userOp);
+
+  const cosignature = await cosignUserOp(userOp);
+
+  const formattedSignature = formatUserOpSignature({
+    userOp,
+    userOpSignature: request.signature,
+    userOpCosignature: cosignature,
     permissionManagerOwnerIndex,
     permission,
   });
 
   const userOpHash = await bundlerClient.sendUserOperation({
     userOperation: {
-      ...updatedOp,
-      // bigint-ify hexlified numbers for compiler
-      nonce: BigInt(updatedOp.nonce),
-      callGasLimit: BigInt(updatedOp.callGasLimit),
-      verificationGasLimit: BigInt(updatedOp.verificationGasLimit),
-      preVerificationGas: BigInt(updatedOp.preVerificationGas),
-      maxFeePerGas: BigInt(updatedOp.maxFeePerGas),
-      maxPriorityFeePerGas: BigInt(updatedOp.maxPriorityFeePerGas),
+      ...userOp,
+      signature: formattedSignature,
     },
   });
 

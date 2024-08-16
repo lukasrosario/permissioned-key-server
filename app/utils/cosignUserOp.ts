@@ -1,5 +1,5 @@
 import { privateKeyToAccount } from "viem/accounts";
-import { Hex } from "viem";
+import { Hex, keccak256 } from "viem";
 import {
   ENTRYPOINT_ADDRESS_V06,
   getUserOperationHash,

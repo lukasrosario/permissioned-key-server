@@ -1,39 +1,40 @@
 import {
   Address,
   Hex,
-  decodeAbiParameters,
   encodeFunctionData,
   hexToBigInt,
   isAddressEqual,
   zeroAddress,
 } from "viem";
 import { smartWalletAbi } from "@/app/abi/smartWallet";
-import { buildAssertSpendCall } from "./buildAssertSpendCall";
-import { hashPermission } from "./hashPermission";
-import { permissionCallableAbi } from "@/app/abi/permissionCallable";
 import { preparePermissionedCall } from "@/app/utils/preparePermissionedCall";
 import { decodePermissionContext } from "@/app/utils/decodePermissionContext";
 import { prepareAssertSpend } from "@/app/utils/prepareAssertSpend";
 import { Call } from "@/app/types";
 import { prepareCheckBeforeCalls } from "@/app/utils/prepareCheckBeforeCalls";
 import { cosignerAccount } from "@/app/utils/cosignUserOp";
-
-export const CallWithPermission = "0x245e88921605b20338456529956a30b795636a55";
+import { NativeTokenRollingSpendLimitPermission } from "../constants";
 
 export async function getCallData(
   calls: Call[],
   permissionsContext?: Hex,
   gasSpend?: bigint, // omit on first pass and then come back
+  paymaster?: Address,
 ): Promise<Hex> {
   if (!permissionsContext) {
     return encodeCallData(calls);
   }
-  let newCalls: Call;
+
   const { permission } = decodePermissionContext(permissionsContext);
-  if (isAddressEqual(permission.permissionContract, CallWithPermission)) {
+  if (
+    isAddressEqual(
+      permission.permissionContract,
+      NativeTokenRollingSpendLimitPermission,
+    )
+  ) {
     const checkBeforeCalls = prepareCheckBeforeCalls({
       permission,
-      paymaster: zeroAddress,
+      paymaster: paymaster ?? zeroAddress,
       cosigner: cosignerAccount.address,
     });
 
@@ -51,7 +52,7 @@ export async function getCallData(
       permission,
       callsSpend,
       gasSpend: gasSpend ?? BigInt(0),
-      paymaster: zeroAddress,
+      paymaster: paymaster ?? zeroAddress,
     });
 
     calls = [checkBeforeCalls, ...permissionedCalls, assertSpendCall];
