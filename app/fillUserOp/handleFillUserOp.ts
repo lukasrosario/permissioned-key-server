@@ -51,7 +51,7 @@ export async function handleFillUserOp(request: FillUserOpParams) {
     signature: DUMMY_SIGNATURE,
   };
   const initialGasSpend = getRequiredPrefund(userOpToSign);
-  const initialCallData = await getCallData(
+  let initialCallData = await getCallData(
     calls,
     capabilities.permissions?.context,
     initialGasSpend,
@@ -62,25 +62,32 @@ export async function handleFillUserOp(request: FillUserOpParams) {
     callData: initialCallData,
   };
 
-  const paymasterStubData = await paymasterEip7677Client.getPaymasterStubData({
-    userOperation: userOpToSign,
-    context: {},
-    chain: baseSepolia,
-  });
+  let paymaster;
+  const usePaymaster = false;
 
-  const paymaster = slice(paymasterStubData.paymasterAndData, 0, 20);
-  const initialCallData2 = await getCallData(
-    calls,
-    capabilities.permissions?.context,
-    initialGasSpend,
-    paymaster,
-  );
+  if (usePaymaster) {
+    const paymasterStubData = await paymasterEip7677Client.getPaymasterStubData(
+      {
+        userOperation: userOpToSign,
+        context: {},
+        chain: baseSepolia,
+      },
+    );
 
-  userOpToSign = {
-    ...userOpToSign,
-    callData: initialCallData2,
-    paymasterAndData: paymasterStubData.paymasterAndData,
-  };
+    paymaster = slice(paymasterStubData.paymasterAndData, 0, 20);
+    initialCallData = await getCallData(
+      calls,
+      capabilities.permissions?.context,
+      initialGasSpend,
+      paymaster,
+    );
+
+    userOpToSign = {
+      ...userOpToSign,
+      callData: initialCallData,
+      paymasterAndData: paymasterStubData.paymasterAndData,
+    };
+  }
 
   const gasEstimates = await bundlerClient.estimateUserOperationGas({
     userOperation: userOpToSign,
@@ -106,15 +113,17 @@ export async function handleFillUserOp(request: FillUserOpParams) {
     callData: finalCallData,
   };
 
-  const paymasterData = await paymasterEip7677Client.getPaymasterData({
-    userOperation: userOpToSign,
-    context: {},
-  });
+  if (usePaymaster) {
+    const paymasterData = await paymasterEip7677Client.getPaymasterData({
+      userOperation: userOpToSign,
+      context: {},
+    });
 
-  userOpToSign = {
-    ...userOpToSign,
-    paymasterAndData: paymasterData.paymasterAndData,
-  };
+    userOpToSign = {
+      ...userOpToSign,
+      paymasterAndData: paymasterData.paymasterAndData,
+    };
+  }
 
   const { hash, base64Hash } = await getUserOpHash(userOpToSign);
 
