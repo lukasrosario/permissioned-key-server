@@ -49,7 +49,7 @@ export const permissionManagerAbi = [
         components: [
           { name: "account", type: "address", internalType: "address" },
           { name: "chainId", type: "uint256", internalType: "uint256" },
-          { name: "expiry", type: "uint40", internalType: "uint40" },
+          { name: "expiry", type: "uint48", internalType: "uint48" },
           { name: "signer", type: "bytes", internalType: "bytes" },
           {
             name: "permissionContract",

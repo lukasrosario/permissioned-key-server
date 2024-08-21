@@ -7,6 +7,7 @@ import {
 } from "viem";
 import { Call, SmartWalletPermission } from "../types";
 import { hashPermission } from "./hashPermission";
+import { permissionContractAbi } from "../abi/PermissionCallableAllowedContractNativeTokenRecurringAllowance";
 
 type PrepareUseRecurringAllowanceArgs = {
   permission: SmartWalletPermission;

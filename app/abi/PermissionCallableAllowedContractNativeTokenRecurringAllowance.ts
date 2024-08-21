@@ -1,4 +1,4 @@
-const permissionContractAbi = [
+export const permissionContractAbi = [
   {
     type: "constructor",
     inputs: [
