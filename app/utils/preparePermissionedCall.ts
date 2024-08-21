@@ -1,7 +1,7 @@
 import { encodeFunctionData, Hex } from "viem";
 
 import { Call } from "../types";
-import { permissionCallableAbi } from "../abi/permissionCallable";
+import { permissionCallableAbi } from "../abi/PermissionCallable";
 
 export function preparePermissionedCall(call: Call) {
   const permissionedCall = {

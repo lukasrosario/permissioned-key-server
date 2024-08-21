@@ -9,11 +9,11 @@ import {
 import { smartWalletAbi } from "@/app/abi/smartWallet";
 import { preparePermissionedCall } from "@/app/utils/preparePermissionedCall";
 import { decodePermissionContext } from "@/app/utils/decodePermissionContext";
-import { prepareAssertSpend } from "@/app/utils/prepareAssertSpend";
+import { prepareUseRecurringAllowance } from "@/app/utils/prepareUseRecurringAllowance";
 import { Call } from "@/app/types";
-import { prepareCheckBeforeCalls } from "@/app/utils/prepareCheckBeforeCalls";
+import { prepareBeforeCalls } from "@/app/utils/prepareBeforeCalls";
 import { cosignerAccount } from "@/app/utils/cosignUserOp";
-import { NativeTokenRollingSpendLimitPermission } from "../constants";
+import { PermissionCallableAllowedContractNativeTokenRecurringAllowance } from "../constants";
 
 export async function getCallData(
   calls: Call[],
@@ -29,10 +29,10 @@ export async function getCallData(
   if (
     isAddressEqual(
       permission.permissionContract,
-      NativeTokenRollingSpendLimitPermission,
+      PermissionCallableAllowedContractNativeTokenRecurringAllowance,
     )
   ) {
-    const checkBeforeCalls = prepareCheckBeforeCalls({
+    const beforeCalls = prepareBeforeCalls({
       permission,
       paymaster: paymaster ?? zeroAddress,
       cosigner: cosignerAccount.address,
@@ -48,14 +48,14 @@ export async function getCallData(
       BigInt(0),
     );
 
-    const assertSpendCall = await prepareAssertSpend({
+    const assertSpendCall = await prepareUseRecurringAllowance({
       permission,
       callsSpend,
       gasSpend: gasSpend ?? BigInt(0),
       paymaster: paymaster ?? zeroAddress,
     });
 
-    calls = [checkBeforeCalls, ...permissionedCalls, assertSpendCall];
+    calls = [beforeCalls, ...permissionedCalls, assertSpendCall];
   }
 
   return encodeCallData(calls);

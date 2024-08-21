@@ -2,7 +2,7 @@ export const permissionManagerAbi = [
   {
     type: "constructor",
     inputs: [
-      { name: "owner", type: "address", internalType: "address" },
+      { name: "owner_", type: "address", internalType: "address" },
       { name: "cosigner_", type: "address", internalType: "address" },
     ],
     stateMutability: "nonpayable",
@@ -25,11 +25,7 @@ export const permissionManagerAbi = [
             type: "address",
             internalType: "address",
           },
-          {
-            name: "permissionFields",
-            type: "bytes",
-            internalType: "bytes",
-          },
+          { name: "permissionValues", type: "bytes", internalType: "bytes" },
           {
             name: "verifyingContract",
             type: "address",
@@ -44,23 +40,36 @@ export const permissionManagerAbi = [
   },
   {
     type: "function",
-    name: "checkBeforeCalls",
+    name: "beforeCalls",
     inputs: [
-      { name: "expiry", type: "uint256", internalType: "uint256" },
       {
-        name: "permissionContract",
-        type: "address",
-        internalType: "address",
+        name: "permission",
+        type: "tuple",
+        internalType: "struct PermissionManager.Permission",
+        components: [
+          { name: "account", type: "address", internalType: "address" },
+          { name: "chainId", type: "uint256", internalType: "uint256" },
+          { name: "expiry", type: "uint40", internalType: "uint40" },
+          { name: "signer", type: "bytes", internalType: "bytes" },
+          {
+            name: "permissionContract",
+            type: "address",
+            internalType: "address",
+          },
+          { name: "permissionValues", type: "bytes", internalType: "bytes" },
+          {
+            name: "verifyingContract",
+            type: "address",
+            internalType: "address",
+          },
+          { name: "approval", type: "bytes", internalType: "bytes" },
+        ],
       },
       { name: "paymaster", type: "address", internalType: "address" },
-      {
-        name: "userOpCosigner",
-        type: "address",
-        internalType: "address",
-      },
+      { name: "userOpCosigner", type: "address", internalType: "address" },
     ],
     outputs: [],
-    stateMutability: "view",
+    stateMutability: "nonpayable",
   },
   {
     type: "function",
@@ -87,11 +96,7 @@ export const permissionManagerAbi = [
             type: "address",
             internalType: "address",
           },
-          {
-            name: "permissionFields",
-            type: "bytes",
-            internalType: "bytes",
-          },
+          { name: "permissionValues", type: "bytes", internalType: "bytes" },
           {
             name: "verifyingContract",
             type: "address",
@@ -115,11 +120,7 @@ export const permissionManagerAbi = [
     type: "function",
     name: "isPermissionApproved",
     inputs: [
-      {
-        name: "permissionHash",
-        type: "bytes32",
-        internalType: "bytes32",
-      },
+      { name: "permissionHash", type: "bytes32", internalType: "bytes32" },
       { name: "account", type: "address", internalType: "address" },
     ],
     outputs: [{ name: "approved", type: "bool", internalType: "bool" }],
@@ -142,11 +143,7 @@ export const permissionManagerAbi = [
     type: "function",
     name: "isPermissionRevoked",
     inputs: [
-      {
-        name: "permissionHash",
-        type: "bytes32",
-        internalType: "bytes32",
-      },
+      { name: "permissionHash", type: "bytes32", internalType: "bytes32" },
       { name: "account", type: "address", internalType: "address" },
     ],
     outputs: [{ name: "revoked", type: "bool", internalType: "bool" }],
@@ -201,11 +198,7 @@ export const permissionManagerAbi = [
     type: "function",
     name: "revokePermission",
     inputs: [
-      {
-        name: "permissionHash",
-        type: "bytes32",
-        internalType: "bytes32",
-      },
+      { name: "permissionHash", type: "bytes32", internalType: "bytes32" },
     ],
     outputs: [],
     stateMutability: "nonpayable",
@@ -247,23 +240,6 @@ export const permissionManagerAbi = [
     ],
     outputs: [],
     stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "setShouldAddPaymasterGasToTotalSpend",
-    inputs: [
-      { name: "paymaster", type: "address", internalType: "address" },
-      { name: "addGasSpend", type: "bool", internalType: "bool" },
-    ],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "shouldAddPaymasterGasToTotalSpend",
-    inputs: [{ name: "paymaster", type: "address", internalType: "address" }],
-    outputs: [{ name: "enabled", type: "bool", internalType: "bool" }],
-    stateMutability: "view",
   },
   {
     type: "function",
@@ -359,12 +335,7 @@ export const permissionManagerAbi = [
         indexed: true,
         internalType: "address",
       },
-      {
-        name: "enabled",
-        type: "bool",
-        indexed: false,
-        internalType: "bool",
-      },
+      { name: "enabled", type: "bool", indexed: false, internalType: "bool" },
     ],
     anonymous: false,
   },
@@ -410,12 +381,7 @@ export const permissionManagerAbi = [
         indexed: true,
         internalType: "address",
       },
-      {
-        name: "enabled",
-        type: "bool",
-        indexed: false,
-        internalType: "bool",
-      },
+      { name: "enabled", type: "bool", indexed: false, internalType: "bool" },
     ],
     anonymous: false,
   },
@@ -457,9 +423,9 @@ export const permissionManagerAbi = [
   { type: "error", name: "EnforcedPause", inputs: [] },
   { type: "error", name: "ExpectedPause", inputs: [] },
   { type: "error", name: "ExpiredPermission", inputs: [] },
+  { type: "error", name: "InvalidBeforeCallsCall", inputs: [] },
   { type: "error", name: "InvalidPermissionApproval", inputs: [] },
   { type: "error", name: "InvalidSignature", inputs: [] },
-  { type: "error", name: "InvalidUserOperationCallData", inputs: [] },
   { type: "error", name: "InvalidUserOperationHash", inputs: [] },
   { type: "error", name: "InvalidUserOperationSender", inputs: [] },
   { type: "error", name: "MissingPendingCosigner", inputs: [] },
