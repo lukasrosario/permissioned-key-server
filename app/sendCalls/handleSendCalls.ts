@@ -1,40 +1,32 @@
-import { Hex, encodeAbiParameters } from "viem";
+import { encodeAbiParameters } from "viem";
 import { bundlerClient } from "../clients";
 import { baseSepolia } from "viem/chains";
-import {
-  unhexlifyUserOp,
-  UserOperationWithBigIntAsHex,
-} from "./utils/unhexlifyUserOp";
+import { unhexlifyUserOp } from "./utils/unhexlifyUserOp";
 import { cosignUserOp } from "../utils/cosignUserOp";
 import { formatUserOpSignature } from "../utils/formatUserOpSignature";
 import { decodePermissionContext } from "../utils/decodePermissionContext";
+import { PrepareOrSendCallsParams } from "../types";
 
-type SendUserOpWithSignatureParams = {
-  chainId: Hex;
-  userOp: UserOperationWithBigIntAsHex;
-  permissionsContext: Hex;
-  signature: Hex;
+export type SendCallsRequest = {
+  method: "wallet_sendCalls";
+  params: PrepareOrSendCallsParams;
 };
 
-export type SendUserOpWithSignatureRequest = {
-  method: "wallet_sendUserOpWithSignature";
-  params: SendUserOpWithSignatureParams;
-};
-
-export async function handleSendUserOpWithSignature(
-  request: SendUserOpWithSignatureParams,
-) {
+export async function handleSendCalls(request: PrepareOrSendCallsParams) {
   const { permissionManagerOwnerIndex, permission } = decodePermissionContext(
-    request.permissionsContext,
+    request[0].capabilities.permissions.context,
   );
 
-  const userOp = unhexlifyUserOp(request.userOp);
+  const userOp = unhexlifyUserOp(
+    request[0].capabilities.permissions.preparedCalls[0].values,
+  );
 
   const cosignature = await cosignUserOp(userOp);
 
   const formattedSignature = formatUserOpSignature({
     userOp,
-    userOpSignature: request.signature,
+    userOpSignature:
+      request[0].capabilities.permissions.preparedCalls[0].signature,
     userOpCosignature: cosignature,
     permissionManagerOwnerIndex,
     permission,

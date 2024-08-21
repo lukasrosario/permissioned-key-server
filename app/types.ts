@@ -1,4 +1,5 @@
 import { Address, Hex } from "viem";
+import { UserOperationWithBigIntAsHex } from "./sendCalls/utils/unhexlifyUserOp";
 
 // 1:1 object with contract struct Permission
 export type SmartWalletPermission = {
@@ -13,10 +14,27 @@ export type SmartWalletPermission = {
 };
 
 export type Call = {
+  chainId: Hex;
   to: Address;
   value: Hex;
   data: Hex;
 };
+
+export type PrepareOrSendCallsParams = {
+  from: Address;
+  calls: Call[];
+  capabilities: {
+    paymasterService: { url: string };
+    permissions: {
+      context: Hex;
+      preparedCalls: {
+        signature: Hex;
+        type: string;
+        values: UserOperationWithBigIntAsHex;
+      }[];
+    };
+  };
+}[];
 
 export type RecurringAllowance = {
   start: number; // unix seconds
