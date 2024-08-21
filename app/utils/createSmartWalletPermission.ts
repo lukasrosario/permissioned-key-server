@@ -1,15 +1,14 @@
 import { Address, encodeAbiParameters, Hex } from "viem";
 import {
   DataType,
-  NativeTokenRollingSpendLimitPermissionType,
-  P256SignerType,
   PermissionType,
+  permissionValuesStruct,
   SignerType,
   SmartWalletPermission,
 } from "../types";
 import {
   PermissionManager,
-  NativeTokenRollingSpendLimitPermission,
+  PermissionCallableAllowedContractNativeTokenRecurringAllowance,
 } from "../constants";
 
 // convert between received PermissionRequest to contract-compatible SmartWalletPermission
@@ -31,20 +30,21 @@ export function createSmartWalletPermission({
   if (signer.type !== SignerType.P256) {
     throw Error("Invalid signer type");
   }
-  if (permission.type !== PermissionType.NativeTokenRollingSpendLimit) {
+  if (permission.type !== PermissionType.NativeTokenRecurringAllowance) {
     throw Error("Invalid permission type");
   }
 
-  const permissionFields = encodeAbiParameters(
+  const permissionValues = encodeAbiParameters(
+    [permissionValuesStruct],
     [
-      { name: "spendLimit", type: "uint256" },
-      { name: "rollingPeriod", type: "uint256" },
-      { name: "allowedContract", type: "address" },
-    ],
-    [
-      BigInt(permission.data.spendLimit),
-      BigInt(permission.data.rollingPeriod),
-      permission.data.allowedContract,
+      {
+        recurringAllowance: {
+          start: permission.data.start,
+          period: permission.data.period,
+          allowance: permission.data.allowance,
+        },
+        allowedContract: permission.data.allowedContract,
+      },
     ],
   );
 
@@ -53,8 +53,9 @@ export function createSmartWalletPermission({
     chainId: BigInt(chainId),
     expiry,
     signer: signer.data.publicKey,
-    permissionContract: NativeTokenRollingSpendLimitPermission,
-    permissionFields,
+    permissionContract:
+      PermissionCallableAllowedContractNativeTokenRecurringAllowance,
+    permissionValues,
     verifyingContract: PermissionManager,
     approval: "0x",
   };

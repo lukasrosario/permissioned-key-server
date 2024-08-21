@@ -1,6 +1,6 @@
 import { Address } from "viem";
 
 export const PermissionManager =
-  "0x384E8b4617886C7070ABd6037c4D5AbeC5B1d14d" as Address;
-export const NativeTokenRollingSpendLimitPermission =
-  "0x77514b0AA9e8C6F1892F8D107894155C40315edd" as Address;
+  "0x98549c7A6513c20b66FacAd469b3d94a3B7B6992" as Address;
+export const PermissionCallableAllowedContractNativeTokenRecurringAllowance =
+  "0x08f955BC6665250c8Ad546Ba225b2352bC6Cd1d5" as Address;

@@ -1,33 +1,27 @@
-import { Address, encodeFunctionData, Hex, keccak256 } from "viem";
-import { UserOperation } from "permissionless";
+import { Address, encodeFunctionData, Hex } from "viem";
 
 import { PermissionManager } from "../constants";
 import { SmartWalletPermission } from "../types";
 import { permissionManagerAbi } from "../abi/PermissionManager";
 
-type PrepareCheckBeforeCallsArgs = {
+type PrepareBeforeCallsArgs = {
   permission: SmartWalletPermission;
   paymaster: Address;
   cosigner: Address;
 };
 
-export function prepareCheckBeforeCalls({
+export function prepareBeforeCalls({
   permission,
   paymaster,
   cosigner,
-}: PrepareCheckBeforeCallsArgs) {
+}: PrepareBeforeCallsArgs) {
   const checkBeforeCalls = {
     to: PermissionManager,
     value: "0x0" as Hex,
     data: encodeFunctionData({
       abi: permissionManagerAbi,
-      functionName: "checkBeforeCalls",
-      args: [
-        permission.expiry,
-        permission.permissionContract,
-        paymaster,
-        cosigner,
-      ],
+      functionName: "beforeCalls",
+      args: [permission, paymaster, cosigner],
     }),
   };
   return checkBeforeCalls;
